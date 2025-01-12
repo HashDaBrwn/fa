@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.2">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;FA Minimization Web App&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- Load PyScript from CDN --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script defer src="https://pyscript.net/latest/pyscript.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body { font-family: sans-serif; margin: 2rem; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#output { white-space: pre-wrap; background: #f4f4f4; padding: 1rem; border: 1px solid #ccc; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>input, button { margin: 0.25rem 0; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;h1&gt;FA Minimization&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;p&gt;This web app minimizes an FA (DFA) using a coloring algorithm. (State numbering starts at 1.)&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;p&gt;You can enter your FA in a simple format (see instructions below) and click "Minimize".&lt;/p&gt;</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- Instructions for input format --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;h3&gt;Input Format&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>Enter the FA information as JSON with the following keys:</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;br&gt;&lt;code&gt;start_state&lt;/code&gt;: an integer (e.g., 1)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;br&gt;&lt;code&gt;transitions&lt;/code&gt;: a dictionary mapping state numbers (as strings) to an object of input symbols and destination states, for example:</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;br&gt;&lt;code&gt;{"1": {"a": 2, "b": 3}, "2": {"a": 1, "b": 4}, "4": {"a": 2, "b": 5}, "5": {"a": 3, "b": 5}}&lt;/code&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;br&gt;&lt;code&gt;final_states&lt;/code&gt;: a list of integers (e.g., [4, 5])</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;p&gt;You can use the example below or modify it.&lt;/p&gt;</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;textarea id="fa_input" cols="80" rows="10"&gt;</p>
+<p class="p1">{</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"start_state": 1,</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"transitions": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"1": {"a": 2, "b": 3},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"2": {"a": 1, "b": 4},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"4": {"a": 2, "b": 5},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"5": {"a": 3, "b": 5}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"final_states": [4, 5]</p>
+<p class="p1">}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/textarea&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;button id="minimizeButton"&gt;Minimize FA&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;h3&gt;Output&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="output"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;py-script&gt;</p>
+<p class="p1">import json</p>
+<p class="p2"><br></p>
+<p class="p1">def minimize_fa_conversion(fa_data):</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"""</p>
+<p class="p1"><span class="Apple-converted-space">    </span>Minimize an FA using a coloring algorithm.</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>Parameters:</p>
+<p class="p1"><span class="Apple-converted-space">      </span>fa_data: a dictionary with keys:</p>
+<p class="p1"><span class="Apple-converted-space">               </span>- start_state (int)</p>
+<p class="p1"><span class="Apple-converted-space">               </span>- transitions (dict): { state: { symbol: destination_state, ... }, ... }</p>
+<p class="p1"><span class="Apple-converted-space">               </span>- final_states (list of int)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>Returns:</p>
+<p class="p1"><span class="Apple-converted-space">      </span>A tuple (new_start, minimized_transitions, minimized_finals) representing the minimized FA.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"""</p>
+<p class="p1"><span class="Apple-converted-space">    </span>start_state = fa_data["start_state"]</p>
+<p class="p1"><span class="Apple-converted-space">    </span>transitions = {int(k): v for k, v in fa_data["transitions"].items()}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>final_states = set(fa_data["final_states"])</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span># Determine all states (including those appearing as destinations)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>all_states = set(transitions.keys())</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for s in transitions:</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for dest in transitions[s].values():</p>
+<p class="p1"><span class="Apple-converted-space">            </span>all_states.add(dest)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>all_states = sorted(all_states)</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span># Determine alphabet (assumed the same for every state)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>alphabet = set()</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for s in transitions:</p>
+<p class="p1"><span class="Apple-converted-space">        </span>alphabet.update(transitions[s].keys())</p>
+<p class="p1"><span class="Apple-converted-space">    </span>alphabet = sorted(list(alphabet))</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span># Step 1: Initial coloring.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>colors = { s: (0 if s in final_states else 1) for s in all_states }</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>output_text = ""</p>
+<p class="p1"><span class="Apple-converted-space">    </span>output_text += "Initial coloring:\n"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for s in sorted(all_states):</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tag = ""</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if s == start_state: tag += "[START] "</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if s in final_states: tag += "[FINAL]"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>output_text += f"<span class="Apple-converted-space">  </span>State {s}: color {colors[s]} {tag}\n"</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span># Iterative refinement.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>iteration = 0</p>
+<p class="p1"><span class="Apple-converted-space">    </span>while True:</p>
+<p class="p1"><span class="Apple-converted-space">        </span>iteration += 1</p>
+<p class="p1"><span class="Apple-converted-space">        </span>new_colors = {}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for s in all_states:</p>
+<p class="p1"><span class="Apple-converted-space">            </span>row = []</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for sym in alphabet:</p>
+<p class="p1"><span class="Apple-converted-space">                </span>dest = transitions[s].get(sym, None)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>row.append(colors.get(dest, None))</p>
+<p class="p1"><span class="Apple-converted-space">            </span>new_colors[s] = (colors[s], tuple(row))</p>
+<p class="p1"><span class="Apple-converted-space">        </span>pattern_to_color = {}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>next_color = 0</p>
+<p class="p1"><span class="Apple-converted-space">        </span>updated_colors = {}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for s in sorted(all_states):</p>
+<p class="p1"><span class="Apple-converted-space">            </span>pattern = new_colors[s]</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if pattern not in pattern_to_color:</p>
+<p class="p1"><span class="Apple-converted-space">                </span>pattern_to_color[pattern] = next_color</p>
+<p class="p1"><span class="Apple-converted-space">                </span>next_color += 1</p>
+<p class="p1"><span class="Apple-converted-space">            </span>updated_colors[s] = pattern_to_color[pattern]</p>
+<p class="p1"><span class="Apple-converted-space">        </span>output_text += f"\nIteration {iteration}:\n"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for s in sorted(all_states):</p>
+<p class="p1"><span class="Apple-converted-space">            </span>output_text += f"<span class="Apple-converted-space">  </span>State {s}: old color {colors[s]} -&gt; new color {updated_colors[s]} with row pattern {new_colors[s][1]}\n"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if updated_colors == colors:</p>
+<p class="p1"><span class="Apple-converted-space">            </span>output_text += "\nColoring stabilized. Final partition achieved.\n"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>break</p>
+<p class="p1"><span class="Apple-converted-space">        </span>colors = updated_colors</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span># Group states by final color.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>groups = {}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for s in all_states:</p>
+<p class="p1"><span class="Apple-converted-space">        </span>groups.setdefault(colors[s], set()).add(s)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>output_text += "\nFinal merged groups:\n"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for col, group in sorted(groups.items()):</p>
+<p class="p1"><span class="Apple-converted-space">        </span>output_text += f"<span class="Apple-converted-space">  </span>Group with color {col}: states {sorted(group)}\n"</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span># Map each group to a new state number (use the smallest state number as representative).</p>
+<p class="p1"><span class="Apple-converted-space">    </span>new_state_map = {}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for col, group in groups.items():</p>
+<p class="p1"><span class="Apple-converted-space">        </span>rep = min(group)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for s in group:</p>
+<p class="p1"><span class="Apple-converted-space">            </span>new_state_map[s] = rep</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span># Build minimized transitions.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>minimized_transitions = {}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for rep in sorted(set(new_state_map.values())):</p>
+<p class="p1"><span class="Apple-converted-space">        </span>minimized_transitions[rep] = {}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for sym in alphabet:</p>
+<p class="p1"><span class="Apple-converted-space">            </span>dest = transitions[rep].get(sym, None)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if dest is not None:</p>
+<p class="p1"><span class="Apple-converted-space">                </span>minimized_transitions[rep][sym] = new_state_map[dest]</p>
+<p class="p1"><span class="Apple-converted-space">            </span>else:</p>
+<p class="p1"><span class="Apple-converted-space">                </span>minimized_transitions[rep][sym] = "-"</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span># Determine minimized final states.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>minimized_finals = set()</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for rep in set(new_state_map.values()):</p>
+<p class="p1"><span class="Apple-converted-space">        </span>group = [s for s, r in new_state_map.items() if r == rep]</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if any(s in final_states for s in group):</p>
+<p class="p1"><span class="Apple-converted-space">            </span>minimized_finals.add(rep)</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>new_start = new_state_map[start_state]</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span># Build output table.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>output_text += "\nMinimized FA (Transition Table):\n"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>header = "State".ljust(10)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for sym in alphabet:</p>
+<p class="p1"><span class="Apple-converted-space">        </span>header += sym.ljust(15)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>output_text += header + "\n"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for s in sorted(minimized_transitions.keys()):</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tag = ""</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if s == new_start: tag += "[START] "</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if s in minimized_finals: tag += "[FINAL]"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>row = (str(s) + " " + tag).ljust(10)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for sym in alphabet:</p>
+<p class="p1"><span class="Apple-converted-space">            </span>row += str(minimized_transitions[s][sym]).ljust(15)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>output_text += row + "\n"</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>output_text += "\nMerging Explanation:\n"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for col, group in sorted(groups.items()):</p>
+<p class="p1"><span class="Apple-converted-space">        </span>rep = min(group)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if len(group) &gt; 1:</p>
+<p class="p1"><span class="Apple-converted-space">            </span>output_text += f"<span class="Apple-converted-space">  </span>New state {rep} represents merged states: {sorted(group)}\n"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>else:</p>
+<p class="p1"><span class="Apple-converted-space">            </span>output_text += f"<span class="Apple-converted-space">  </span>New state {rep} represents state {rep}\n"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>output_text += f"\nNew Start State: {new_start}\n"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>output_text += f"New Final State(s): {sorted(minimized_finals)}\n"</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>return output_text</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"># Attach button event to run minimization.</p>
+<p class="p1">def run_minimization(*args):</p>
+<p class="p1"><span class="Apple-converted-space">    </span>fa_json = Element("fa_input").value</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try:</p>
+<p class="p1"><span class="Apple-converted-space">        </span>fa_data = json.loads(fa_json)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>except Exception as e:</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Element("output").element.innerText = f"Error parsing JSON: {e}"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return</p>
+<p class="p1"><span class="Apple-converted-space">    </span>result = minimize_fa_conversion(fa_data)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>Element("output").element.innerText = result</p>
+<p class="p2"><br></p>
+<p class="p1"># Register the button click event.</p>
+<p class="p1">from pyscript import Element</p>
+<p class="p1">import json</p>
+<p class="p2"><br></p>
+<p class="p1"># Attach event to the button with id "minimizeButton"</p>
+<p class="p1">Element("minimizeButton").element.onclick = run_minimization</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/py-script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
